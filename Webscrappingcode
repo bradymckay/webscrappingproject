@@ -1,0 +1,60 @@
+#All the imports needed to properly run. 
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+from datetime import datetime
+import os
+import time
+
+
+def auto_crypto_pull():
+
+    #the wensite to scrape.
+    url = 'https://coinmarketcap.com/coins/'
+    
+    page = requests.get(url)
+    
+    soup = BeautifulSoup(page.text,'html')
+
+#This is the the name_html to extract the Bitcoin name. Having a hard time pulling it. So it is pasted here.
+    name_html = '''
+    <span data-role="coin-name" title="Bitcoin" class="sc-65e7f566-0 lsTl">
+        Bitcoin
+        <span class="sc-65e7f566-0 eQBACe coin-name-mobile"> price</span>
+    </span>
+    '''
+    
+    name_soup = BeautifulSoup(html, 'html.parser')
+    
+    crypto_name = name_soup.find('span', {'data-role': 'coin-name'}).contents[0].strip()
+
+    #Same issue as the name_html, however this should be dynamic, not static.
+    price_html = '''
+    <span class="sc-65e7f566-0 WXGwg base-text" data-test="text-cdp-price-display">$94,441.67</span>
+    '''
+    
+    price_soup = BeautifulSoup(price_html, 'html.parser')
+    
+    price = price_soup.find('span', {'data-test': 'text-cdp-price-display'}).text
+    
+    final_price = price.replace('$','')
+    
+    date_time = datetime.now()
+
+    dict = {'Crypto Name':crypto_name,
+            'Price':final_price,
+           'TimeStamp':date_time}
+    
+    df = pd.DataFrame([dict])
+
+#Insert you own paths to your files to allow it run.
+    if os.path.exists():
+        df.to_csv()
+    else:
+        df.to_csv() 
+
+    print(df)
+
+while True:
+    auto_crypto_pull()
+    time.sleep(10)
